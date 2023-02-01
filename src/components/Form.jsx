@@ -2,7 +2,7 @@ import React from "react";
 import { coins } from "../data/coins";
 import styled from "@emotion/styled";
 import useSelectCoin from "../hooks/useSelectCoin";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const InputSubmit = styled.input`
   background-color: #66a2fe;
@@ -22,8 +22,27 @@ const InputSubmit = styled.input`
   }
 `;
 
+const Error = styled.p`
+  background-color: #cf1818;
+  padding: 1rem;
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 10px;
+`;
+
 const Form = () => {
+  const [crypto, setCrypto] = useState([]);
+  const [error, setError] = useState(false);
   const [coin, SelectCoin] = useSelectCoin("Choose your coin", coins);
+  const [cryptoCoin, SelectCryptoCoin] = useSelectCoin(
+    "Choose your cryptocurrency",
+    crypto
+  );
 
   useEffect(() => {
     const fetchAPI = async () => {
@@ -31,19 +50,40 @@ const Form = () => {
 
       const response = await fetch(url);
       const result = await response.json();
-      console.log(result.Data)
+
+      const arrayCoins = result.Data.map((coin) => {
+        return {
+          code: coin.CoinInfo.Name,
+          name: coin.CoinInfo.FullName,
+        };
+      });
+
+      setCrypto(arrayCoins);
     };
     fetchAPI();
   }, []);
 
-  const [SelectCrypto] = useSelectCoin("Choose your crypto", "", coin);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (coin === "" || cryptoCoin === "") {
+      setError(true);
+      setTimeout(() => {
+        setError(false);
+      }, 2000);
+      return;
+    }
+  };
 
   return (
-    <form>
-      <SelectCoin />
+    <>
+      {error ? <Error className="error">All fields are required</Error> : null}
 
-      <InputSubmit type="submit" value="Save" />
-    </form>
+      <form onSubmit={handleSubmit}>
+        <SelectCoin /> <SelectCryptoCoin />
+        <InputSubmit type="submit" value="Save" />
+      </form>
+    </>
   );
 };
 

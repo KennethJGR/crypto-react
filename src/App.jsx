@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Form from "./components/Form";
+import Result from "./components/Result";
 import styled from "@emotion/styled";
 import crypto from "./img/imagen-criptos.png";
 
@@ -40,6 +41,9 @@ const Heading = styled.h1`
 `;
 
 function App() {
+
+  const [coin, setCoin] = useState({});
+
   return (
     <Container>
       <Image src={crypto} alt="crypto image" />
@@ -47,9 +51,11 @@ function App() {
       <div>
         <Heading>Cryptocurrency state</Heading>
         <Form />
+        <Result />
+
       </div>
 
-   
+
     </Container>
   );
 }
