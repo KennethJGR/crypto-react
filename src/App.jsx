@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Form from "./components/Form";
 import Result from "./components/Result";
+import Spinner from "./components/Spinner";
 import styled from "@emotion/styled";
-import crypto from "./img/imagen-criptos.png";
+import cryptoImage from "./img/imagen-criptos.png";
 
 const Container = styled.div`
   max-width: 900px;
@@ -41,21 +42,41 @@ const Heading = styled.h1`
 `;
 
 function App() {
+  const [coins, setCoins] = useState({});
+  const [resultAPI, setResultAPI] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const [coin, setCoin] = useState({});
+  useEffect(() => {
+    if (Object.keys(coins).length > 0) {
+      const fetchAPI = async () => {
+        setLoading(true);
+        const { coin, cryptoCoin } = coins;
+
+        const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${cryptoCoin}&tsyms=${coin}`;
+
+        const response = await fetch(url);
+        const result = await response.json();
+
+        setResultAPI(result.DISPLAY[cryptoCoin][coin]);
+
+        setLoading(false);
+      };
+      fetchAPI();
+    }
+  }, [coins]);
 
   return (
     <Container>
-      <Image src={crypto} alt="crypto image" />
+      <Image src={cryptoImage} alt="crypto image" />
 
       <div>
         <Heading>Cryptocurrency state</Heading>
-        <Form />
-        <Result />
+        <Form setCoins={setCoins} />
 
+        {loading && <Spinner />}
+
+        {resultAPI.PRICE && <Result resultAPI={resultAPI} />}
       </div>
-
-
     </Container>
   );
 }

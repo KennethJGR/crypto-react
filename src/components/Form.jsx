@@ -35,7 +35,7 @@ const Error = styled.p`
   border-radius: 10px;
 `;
 
-const Form = () => {
+const Form = ({ setCoins }) => {
   const [crypto, setCrypto] = useState([]);
   const [error, setError] = useState(false);
   const [coin, SelectCoin] = useSelectCoin("Choose your coin", coins);
@@ -73,6 +73,11 @@ const Form = () => {
       }, 2000);
       return;
     }
+
+    setCoins({
+      coin,
+      cryptoCoin,
+    });
   };
 
   return (
